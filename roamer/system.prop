@@ -1,0 +1,31 @@
+#
+# system.prop for roamer
+#
+
+rild.libpath=/system/lib/libril-qc-1.so
+rild.libargs=-d /dev/smd0
+dalvik.vm.lockprof.threshold=500
+dalvik.vm.dexopt-flags=m=y
+dalvik.vm.heapsize=32m
+dalvik.vm.execution-mode=int:jit
+dalvik.vm.dexopt-data-only=1
+
+wifi.interface=eth0
+ro.compcache.default=0
+persist.sys.use_16bpp_alpha=0
+
+# added by ioz9
+ro.sf.hwrotation=0
+debug.sf.hw=1
+persist.rild.nitz_plmn=
+persist.rild.nitz_long_ons_0=
+persist.rild.nitz_long_ons_1=
+persist.rild.nitz_long_ons_2=
+persist.rild.nitz_long_ons_3=
+persist.rild.nitz_short_ons_0=
+persist.rild.nitz_short_ons_1=
+persist.rild.nitz_short_ons_2=
+persist.rild.nitz_short_ons_3=
+persist.data_dsc_mtu=1410
+DEVICE_PROVISIONED=1
+debug.composition.type=mdp
