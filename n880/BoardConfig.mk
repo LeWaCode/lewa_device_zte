@@ -121,7 +121,7 @@ BOARD_FLASH_BLOCK_SIZE := 131072
 BOARD_CUSTOM_RECOVERY_KEYMAPPING:= ../../device/zte/n880/recovery/recovery_ui.c
 TARGET_RECOVERY_INITRC := device/zte/n880/recovery/recovery.rc
 BOARD_CUSTOM_RECOVERY_KEYMAPPING:= ../../device/zte/n880/recovery/recovery_ui.c
-BOARD_CUSTOM_GRAPHICS           := ../../../device/n880/roamer/recovery/graphics.c
+BOARD_CUSTOM_GRAPHICS           := ../../../device/n880/recovery/graphics.c
 
 LEWA_PHONE := cdma
 LEWA_DPI := hdpi
