@@ -1,0 +1,13 @@
+#
+# system.prop for zte blade
+#
+ro.com.android.dateformat=MM-dd-yyyy
+ro.com.android.dataroaming=false
+ro.config.hw_region=zh_CN
+ro.config.hw_timeformat=ture
+ro.config.timeformat=24
+
+persist.sys.language=zh
+persist.sys.country=CN
+persist.sys.timezone=Asia/Shanghai
+#ro.modversion=CyanogenMod7-2.3.7

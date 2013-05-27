@@ -31,7 +31,7 @@ on boot
     chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
 
 # Setup android gadget
-   write /sys/module/g_android/parameters/serial_number CM7-Blade
+   write /sys/module/g_android/parameters/serial_number Blade
    write /sys/module/g_android/parameters/product_id 0x1351
 
 #create  WIFI filesystem structure
@@ -77,10 +77,22 @@ on boot
     chown system system /sys/devices/platform/android_usb/composition
     chown system system /sys/devices/platform/android_usb/remote_wakeup
 
+# joris.tian
+    chmod 0777 /dev/ISL
+#
+
+# added by zhangyawei 2012.03.21, make vocpcm device file readable and writable
+    chmod 0666 /dev/voc_tx_record
+    chmod 0666 /dev/voc_rx_record
+    chmod 0666 /dev/voc_tx_playback
+    chmod 0666 /dev/voc_rx_playback
 
 # Enable MASS storage on SDCARD
     write /sys/devices/platform/mass_storage/lun0/file /dev/block/mmcblk0p1
     write /sys/bus/platform/drivers/msm_sdcc/msm_sdcc.1/polling 1
+
+# joris rm it 2012.03.02
+# exec /system/bin/prox_cal -z
 
 service qmuxd /system/bin/qmuxd 
 
@@ -104,7 +116,7 @@ service hciattach /system/bin/sh /system/etc/init.bt.sh
     oneshot
 
 on property:init.svc.wpa_supplicant=stopped
-    stop dhcpcd_wlan0
+    stop dhcpcd
 
 # WPA SETTINGS
 service wpa_supplicant /system/bin/wpa_supplicant -Dawext -iwlan0 -W -c/data/misc/wifi/wpa_supplicant.conf
@@ -133,3 +145,20 @@ service hostapd /system/bin/hostapd /data/misc/wifi/hostapd.conf
     group wifi inet
     oneshot
     disabled
+
+# added by zhangyawei, add ga module
+service sysd /system/bin/sysd
+    user root
+    disabled
+    oneshot
+
+on property:dev.bootcomplete=1
+    start sysd
+
+# Woody Guo @ 2012/05/28
+# Setup partner
+    chmod 0755 /system/etc/init.partner.sh
+
+service init_partner /system/bin/sh /system/etc/init.partner.sh
+    user root
+    oneshot

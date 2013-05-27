@@ -39,15 +39,19 @@ TARGET_CPU_ABI2 := armeabi
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
 TARGET_BOOTLOADER_BOARD_NAME := roamer
 
+BOARD_KERNEL_CMDLINE := androidboot.hardware=roamer console=null
+
+# Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
-
-BOARD_KERNEL_CMDLINE := androidboot.hardware=roamer console=null
 
 # added by ioz9 for FM
 BOARD_HAVE_FM_RADIO := true
 BOARD_GLOBAL_CFLAGS += -DHAVE_FM_RADIO
 BOARD_FM_DEVICE := bcm4329
+
+# removed by ioz9,it only use in offcial libaudio
+#BOARD_USE_BROADCOM_FM_VOLUME_HACK := true
 
 # Wifi related defines
 BOARD_WPA_SUPPLICANT_DRIVER := WEXT
@@ -105,7 +109,7 @@ BOARD_FLASH_BLOCK_SIZE := 131072
 TARGET_PREBUILT_KERNEL := device/zte/roamer/prebuilt/kernel
 # recovery
 BOARD_USES_RECOVERY_CHINESE := false
-TARGET_PREBUILT_RECOVERY_KERNEL := device/zte/roamer/recovery_kernel
+TARGET_PREBUILT_RECOVERY_KERNEL := device/zte/roamer/prebuilt/recovery_kernel
 BOARD_CUSTOM_RECOVERY_KEYMAPPING:= ../../device/zte/roamer/recovery/recovery_ui.c
 
 # assert

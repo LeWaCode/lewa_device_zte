@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# removed libcamera and liblights by ioz9 for the camera using the zte hal from george
 ifeq ($(TARGET_BOOTLOADER_BOARD_NAME),blade)
-    include $(call all-named-subdir-makefiles, recovery libaudio libril libcamera libgralloc libcopybit libsensors BladeParts liblights)
+    include $(call all-named-subdir-makefiles, recovery libaudio libril libgralloc libcopybit libsensors libcamera liblights BladeParts)
 endif

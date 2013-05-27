@@ -72,10 +72,10 @@ extern "C" {
 
 #include <msm_camera.h>
 
-#define DEFAULT_PICTURE_WIDTH  1024
+#define DEFAULT_PICTURE_WIDTH 1024
 #define DEFAULT_PICTURE_HEIGHT 768
 #define THUMBNAIL_BUFFER_SIZE (THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT * 3/2)
-#define MAX_ZOOM_LEVEL 20
+#define MAX_ZOOM_LEVEL 6
 #define NOT_FOUND -1
 // Number of video buffers held by kernal (initially 1,2 &3)
 #define ACTIVE_VIDEO_BUFFERS 3
@@ -207,20 +207,20 @@ board_property boardProperties[] = {
  */
 //sorted on column basis
 static const camera_size_type picture_sizes[] = {
-//    { 2592, 1944 }, // 5MP
-    { 2560, 1920 }, // 5MP (slightly reduced)
+    { 2592, 1944 }, // 5MP
+//    { 2560, 1920 }, // 5MP (slightly reduced)
     { 2048, 1536 }, // 3MP QXGA
-    //{ 1920, 1080 }, //HD1080
+//    { 1920, 1080 }, //HD1080
     { 1600, 1200 }, // 2MP UXGA
-    { 1280, 768 }, //WXGA
-    { 1280, 720 }, //HD720
+//    { 1280, 768 }, //WXGA
+//    { 1280, 720 }, //HD720
     { 1024, 768}, // 1MP XGA
 //    { 800, 600 }, //SVGA
     { 800, 480 }, // WVGA
     { 640, 480 }, // VGA
-    { 352, 288 }, //CIF
+//    { 352, 288 }, //CIF
     { 320, 240 }, // QVGA
-    { 176, 144 } // QCIF
+//    { 176, 144 } // QCIF
 };
 static int PICTURE_SIZE_COUNT = sizeof(picture_sizes)/sizeof(camera_size_type);
 static const camera_size_type * picture_sizes_ptr;
@@ -313,10 +313,10 @@ static const str_map effects[] = {
     { CameraParameters::EFFECT_NEGATIVE,   CAMERA_EFFECT_NEGATIVE },
     { CameraParameters::EFFECT_SOLARIZE,   CAMERA_EFFECT_SOLARIZE },
     { CameraParameters::EFFECT_SEPIA,      CAMERA_EFFECT_SEPIA },
-//    { CameraParameters::EFFECT_POSTERIZE,  CAMERA_EFFECT_POSTERIZE },
+    { CameraParameters::EFFECT_POSTERIZE,  CAMERA_EFFECT_POSTERIZE },
     { CameraParameters::EFFECT_WHITEBOARD, CAMERA_EFFECT_WHITEBOARD },
     { CameraParameters::EFFECT_BLACKBOARD, CAMERA_EFFECT_BLACKBOARD },
-//    { CameraParameters::EFFECT_AQUA,       CAMERA_EFFECT_AQUA }
+    { CameraParameters::EFFECT_AQUA,       CAMERA_EFFECT_AQUA }
 };
 
 // from qcamera/common/camera.h
@@ -615,7 +615,7 @@ struct SensorType {
 static SensorType sensorTypes[] = {
         { "5mp", 2608, 1960, true,  2592, 1944,0x00000fff },
         { "5mp", 5184, 1944, true,  2592, 1944,0x00000fff }, // actual 5MP blade
-        { "5mp", 2560, 1920, true,  2560, 1920,0x00000fff }, //should be 5MP blade
+        { "5mp", 2560, 1920, false,  2560, 1920,0x00000fff }, //should be 5MP blade
         { "3mp", 2064, 1544, false, 2048, 1536,0x000007ff },
         { "3mp", 4096, 1536, true, 2048, 1536,0x000007ff }, // 3MP blade
         { "2mp", 3200, 1200, false, 1600, 1200,0x000007ff } };
@@ -824,7 +824,7 @@ static void receive_jpeg_callback(jpeg_event_t status);
 static void receive_shutter_callback(common_crop_t *crop);
 static void receive_camframetimeout_callback(void);
 static int fb_fd = -1;
-static int32_t mMaxZoom = 0;
+static int32_t mMaxZoom = 6;
 static bool native_get_maxzoom(int camfd, void *pZm);
 
 static int dstOffset = 0;
@@ -1036,7 +1036,7 @@ void QualcommCameraHardware::initDefaultParameters()
     mParameters.setPictureSize(DEFAULT_PICTURE_WIDTH, DEFAULT_PICTURE_HEIGHT);
     mParameters.setPictureFormat("jpeg"); // informative
 
-    mParameters.set(CameraParameters::KEY_JPEG_QUALITY, "85"); // max quality
+    mParameters.set(CameraParameters::KEY_JPEG_QUALITY, "100"); // max quality
     mParameters.set(CameraParameters::KEY_JPEG_THUMBNAIL_WIDTH,
                     THUMBNAIL_WIDTH_STR); // informative
     mParameters.set(CameraParameters::KEY_JPEG_THUMBNAIL_HEIGHT,
@@ -1111,7 +1111,7 @@ void QualcommCameraHardware::initDefaultParameters()
 
     mParameters.set("luma-adaptation", "3");
     mParameters.set("zoom-supported", "true");
-    mParameters.set("zoom-ratios", "100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200");
+    mParameters.set("zoom-ratios", "100,110,120,130,140,150,160");
     mParameters.set("max-zoom", MAX_ZOOM_LEVEL);
     mParameters.set("zoom", 0);
     mParameters.set(CameraParameters::KEY_PICTURE_FORMAT,
@@ -1391,6 +1391,11 @@ static bool native_get_maxzoom(int camfd, void *pZm)
         return false;
     }
     LOGD("ctrlCmd.value = %d", *(int32_t *)ctrlCmd.value);
+
+    if ((*(int32_t *)ctrlCmd.value) > 6) {
+        *(int32_t *)ctrlCmd.value = 6;
+    }
+    
     memcpy(pZoom, (int32_t *)ctrlCmd.value, sizeof(int32_t));
 
     LOGV("native_get_maxzoom X");
@@ -1867,11 +1872,18 @@ bool QualcommCameraHardware::native_jpeg_encode(void)
 
    /* Set maker and model. Read the NOTICE before changing this */
    char model[PROP_VALUE_MAX];
-   char maker[12];
+   char maker[PROP_VALUE_MAX];//by george,2012-02-15
    int modelLen = 0;
-
-   strncpy(maker,"CyanogenMod",11);
-   maker[11] = '\0';
+   
+   //by george,2012-02-15
+#if 0
+   strncpy(maker,"ZTE",3);
+   maker[3] = '\0';
+#else
+   __system_property_get("ro.product.manufacturer", maker);
+   modelLen=strlen(maker);
+   maker[modelLen] = '\0';
+#endif
    __system_property_get("ro.product.device", model);
    modelLen=strlen(model);
    model[modelLen] = '\0';

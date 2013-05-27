@@ -29,8 +29,8 @@
 #include <cutils/log.h>
 
 #include "nusensors.h"
-#include "BladeProximity.h"
-#include "BladeLight.h"
+#include "TaosProximity.h"
+#include "TaosLight.h"
 #include "AkmSensor.h"
 /*****************************************************************************/
 
@@ -78,29 +78,16 @@ private:
 
 sensors_poll_context_t::sensors_poll_context_t()
 {
-    if(fopen(TAOS_DEVICE_NAME,"rw")) {
-        LOGD("Using taos prox/light sensor");
-        mSensors[prox] = new BladeProximity(const_cast<char *>(TAOS_DEVICE_NAME));
-        mPollFds[prox].fd = mSensors[prox]->getFd();
-        mPollFds[prox].events = POLLIN;
-        mPollFds[prox].revents = 0;
+    mSensors[prox] = new TaosProximity();
+    mPollFds[prox].fd = mSensors[prox]->getFd();
+    mPollFds[prox].events = POLLIN;
+    mPollFds[prox].revents = 0;
 
-        mSensors[light] = new BladeLight(const_cast<char *>(TAOS_DEVICE_NAME));
-        mPollFds[light].fd = mSensors[light]->getFd();
-        mPollFds[light].events = POLLIN;
-        mPollFds[light].revents = 0;
-    } else {
-        LOGD("Using ISL prox/light sensor");
-        mSensors[prox] = new BladeProximity(const_cast<char *>(ISL_DEVICE_NAME));
-        mPollFds[prox].fd = mSensors[prox]->getFd();
-        mPollFds[prox].events = POLLIN;
-        mPollFds[prox].revents = 0;
+    mSensors[light] = new TaosLight();
+    mPollFds[light].fd = mSensors[light]->getFd();
+    mPollFds[light].events = POLLIN;
+    mPollFds[light].revents = 0;
 
-        mSensors[light] = new BladeLight(const_cast<char *>(ISL_DEVICE_NAME));
-        mPollFds[light].fd = mSensors[light]->getFd();
-        mPollFds[light].events = POLLIN;
-        mPollFds[light].revents = 0;
-    }
     mSensors[akm] = new AkmSensor();
     mPollFds[akm].fd = mSensors[akm]->getFd();
     mPollFds[akm].events = POLLIN;
@@ -129,7 +116,7 @@ sensors_poll_context_t::~sensors_poll_context_t() {
 int sensors_poll_context_t::activate(int handle, int enabled) {
     int index = handleToDriver(handle);
     if (index < 0) return index;
-    LOGI("mSensors[%i]->enable(%i, %i)",index, handle, enabled);
+    LOGE("mSensors[%i]->enable(%i, %i)",index, handle, enabled);
     int err =  mSensors[index]->enable(handle, enabled);
     if (enabled && !err) {
         const char wakeMessage(WAKE_MESSAGE);

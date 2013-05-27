@@ -107,7 +107,3 @@ BOARD_FLASH_BLOCK_SIZE := 131072
 
 BOARD_CUSTOM_RECOVERY_KEYMAPPING:= ../../device/zte/blade/recovery/recovery_ui.c
 TARGET_RECOVERY_INITRC := device/zte/blade/recovery/recovery.rc
-
-# add for lewa By YaoSheng
-LEWA_DPI := hdpi
-LEWA_PHONE := gsm

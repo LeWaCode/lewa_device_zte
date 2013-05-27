@@ -24,8 +24,10 @@ public class ProxCalibration extends Activity {
 			p.waitFor();
 			String returned = commandResult.readLine();
 			Log.d(TAG, returned);
-			toast = Toast.makeText(ProxCalibration.this, returned,
-					Toast.LENGTH_LONG);
+			//Begin, Modified by chenqiang for bug 4687,20120324
+			toast = Toast.makeText(ProxCalibration.this, 
+				R.string.successfully_calibrated_proximity_sensor, Toast.LENGTH_LONG);
+			//End
 
 		} catch (Exception ex) {
 			toast = Toast.makeText(ProxCalibration.this,

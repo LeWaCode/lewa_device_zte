@@ -1,4 +1,4 @@
-# Copyright (C) 2009 The Android Open Source Project
+#Copyright (C) 2009 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 
-$(call inherit-product, device/common/gps/gps_eu_supl.mk)
+$(call inherit-product, device/common/gps/gps_cn_supl.mk)
 
 DEVICE_PACKAGE_OVERLAYS := device/zte/blade/overlay
 
@@ -32,17 +32,10 @@ PRODUCT_NAME := zte_blade
 PRODUCT_DEVICE := blade
 PRODUCT_MODEL := ZTE Blade
 
+#add Gallery3D by shenqi 1214
 PRODUCT_PACKAGES += \
-    LiveWallpapers \
-    LiveWallpapersPicker \
-    VisualizationWallpapers \
-    MagicSmokeWallpapers \
-    VisualizationWallpapers \
     librs_jni \
-    Gallery3d \
-    SpareParts \
-    Development \
-    Term \
+    libcamera \
     gralloc.blade \
     copybit.blade \
     gps.blade \
@@ -50,11 +43,24 @@ PRODUCT_PACKAGES += \
     sensors.blade \
     libOmxCore \
     libOmxVidEnc \
-    FM \
     abtfilt \
-    BladeParts \
     prox_cal \
-    dexpreopt
+    dexpreopt \
+    LeWaFM \
+    BladeParts
+
+
+#liuhao removed, use PicFolder.apk 
+#    Gallery3D \
+
+#    Term \
+#    LiveWallpapers \
+#    LiveWallpapersPicker \
+#    VisualizationWallpapers \
+#    MagicSmokeWallpapers \
+#    VisualizationWallpapers \
+#    SpareParts \
+#    Development \
 
 # proprietary side of the device
 $(call inherit-product-if-exists, vendor/zte/blade/blade-vendor.mk)
@@ -110,15 +116,12 @@ PRODUCT_COPY_FILES += \
     device/zte/blade/firmware/regcode:system/wifi/regcode \
     device/zte/blade/firmware/data.patch.hw2_0.bin:system/wifi/data.patch.hw2_0.bin \
     device/zte/blade/firmware/athwlan.bin.z77:system/wifi/athwlan.bin.z77 \
-    device/zte/blade/firmware/athtcmd_ram.bin:system/wifi/athtcmd_ram.bin \
-    device/zte/blade/firmware/device.bin:system/wifi/device.bin \
-    device/zte/blade/firmware/eeprom.bin:system/wifi/eeprom.bin \
-    device/zte/blade/firmware/eeprom.data:system/wifi/eeprom.data
+    device/zte/blade/firmware/athtcmd_ram.bin:system/wifi/athtcmd_ram.bin
 
 #Media profile
 PRODUCT_COPY_FILES += \
     device/zte/blade/media_profiles.xml:system/etc/media_profiles.xml
-
+    
 PRODUCT_PROPERTY_OVERRIDES := \
     keyguard.no_require_sim=true \
     ro.com.android.dateformat=dd-MM-yyyy \
@@ -135,7 +138,11 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.sf.lcd_density=240 \
-    ro.sf.hwrotation=180
+    ro.sf.hwrotation=180 \
+    persist.sys.use_16bpp_alpha=0
+
+# Blade only use two language for lewa branch
+PRODUCT_LOCALES := zh_CN en_US zh_TW
 
 # Blade uses high-density artwork where available
 PRODUCT_LOCALES += hdpi
@@ -167,4 +174,34 @@ PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.dexopt-data-only=1 \
     ro.opengles.version=131072  \
     ro.compcache.default=0
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.lewa.swapper.part_path=/dev/block/mmcblk0p3
+	
+# add for error report  by shenqi ,move to vendor/cyanogen/common/common.mk
+
+# copy default lockscreen theme by shenqi 2011-12-29
+
+PRODUCT_COPY_FILES += \
+         lewa/frameworks/lockscreen/WVGA/lockscreen.zip:/system/media/lockscreen.zip \
+         lewa/frameworks/theme/WVGA/default.lwt:/system/media/default.lwt
+
+# added by ioz9 for hardware wakeup 2012-03-03
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.config.hwfeature_wakeupkey=3 \
+    ro.config.hw_menu_unlockscreen=true
+
+# Perfomance tweaks by ioz9
+PRODUCT_PROPERTY_OVERRIDES += \
+    dalvik.vm.lockprof.threshold=500 \
+    dalvik.vm.dexopt-flags=m=y \
+    dalvik.vm.heapsize=48m \
+    dalvik.vm.execution-mode=int:jit \
+    dalvik.vm.dexopt-data-only=1 \
+    ro.sf.hwrotation=180 \
+    debug.sf.hw=1 \
+    windowsmgr.max_events_per_sec=120 \
+    video.accelerate.hw=1 \
+    debug.composition.type=gpu \
+    debug.performance.tuning=1
 

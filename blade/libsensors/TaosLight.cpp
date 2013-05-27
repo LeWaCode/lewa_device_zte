@@ -24,16 +24,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "PS_ALS_common.h"
+#include "taos_common.h"
 
 #include <cutils/log.h>
 
-#include "BladeLight.h"
+#include "TaosLight.h"
 
 /*****************************************************************************/
 
-BladeLight::BladeLight(char *dev)
-    : SensorBase(dev, "light"),
+TaosLight::TaosLight()
+    : SensorBase(TAOS_DEVICE_NAME, "light"),
       mEnabled(0),
       mInputReader(4),
       mPendingMask(0)
@@ -45,8 +45,8 @@ BladeLight::BladeLight(char *dev)
 
     open_device();
 
-    if (!ioctl(dev_fd, PS_ALS_IOCTL_ALS_ON)) {
-        mEnabled = ioctl(dev_fd, PS_ALS_IOCTL_ALS_GET_ENABLED);
+    if (!ioctl(dev_fd, TAOS_IOCTL_ALS_ON)) {
+        mEnabled = ioctl(dev_fd, TAOS_IOCTL_ALS_GET_ENABLED);
         setInitialState();
     }
     if (!mEnabled) {
@@ -55,13 +55,13 @@ BladeLight::BladeLight(char *dev)
 
 }
 
-BladeLight::~BladeLight() {
+TaosLight::~TaosLight() {
     if (mEnabled) {
         enable(ID_L, 0);
     }
 }
 
-int BladeLight::setInitialState() {
+int TaosLight::setInitialState() {
     struct input_absinfo absinfo;
     if (!ioctl(data_fd, EVIOCGABS(EVENT_TYPE_LIGHT), &absinfo)) {
         mPendingEvents.light = absinfo.value;
@@ -69,7 +69,7 @@ int BladeLight::setInitialState() {
     return 0;
 }
 
-int BladeLight::enable(int32_t handle, int en) {
+int TaosLight::enable(int32_t handle, int en) {
 
     if (handle != ID_L)
         return -EINVAL;
@@ -84,15 +84,15 @@ int BladeLight::enable(int32_t handle, int en) {
         int cmd;
 
 	if (newState) {
-            cmd = PS_ALS_IOCTL_ALS_ON;
+            cmd = TAOS_IOCTL_ALS_ON;
             LOGD_IF(DEBUG,"ALS ON");
         } else {
-            cmd = PS_ALS_IOCTL_ALS_OFF;
+            cmd = TAOS_IOCTL_ALS_OFF;
             LOGD_IF(DEBUG,"ALS OFF");
         }
         err = ioctl(dev_fd, cmd);
         err = err<0 ? -errno : 0;
-        LOGE_IF(err, "PS_ALS_IOCTL_XXX failed (%s)", strerror(-err));
+        LOGE_IF(err, "TAOS_IOCTL_XXX failed (%s)", strerror(-err));
         if (!err) {
             if (en) {
                 setInitialState();
@@ -109,11 +109,11 @@ int BladeLight::enable(int32_t handle, int en) {
     return err;
 }
 
-bool BladeLight::hasPendingEvents() const {
+bool TaosLight::hasPendingEvents() const {
     return mPendingMask;
 }
 
-int BladeLight::readEvents(sensors_event_t* data, int count)
+int TaosLight::readEvents(sensors_event_t* data, int count)
 {
     if (count < 1)
         return -EINVAL;
@@ -140,7 +140,7 @@ int BladeLight::readEvents(sensors_event_t* data, int count)
                  numEventReceived++;
              }
         } else {
-            LOGE("BladeLight: unknown event (type=%d, code=%d)",type, event->code);
+            LOGE("TaosLight: unknown event (type=%d, code=%d)",type, event->code);
         }
         mInputReader.next();
     }

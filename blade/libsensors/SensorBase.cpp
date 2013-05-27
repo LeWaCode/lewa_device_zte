@@ -28,6 +28,12 @@
 
 #include "SensorBase.h"
 
+
+
+// joris.tian added to support ISL prox and light sensor
+#define ISL_DEVICE_NAME      "/dev/ISL"
+
+
 /*****************************************************************************/
 
 SensorBase::SensorBase(
@@ -51,7 +57,22 @@ SensorBase::~SensorBase() {
 int SensorBase::open_device() {
     if (dev_fd<0 && dev_name) {
         dev_fd = open(dev_name, O_RDONLY);
-        LOGE_IF(dev_fd<0, "Couldn't open %s (%s)", dev_name, strerror(errno));
+
+        if(dev_fd < 0)
+	{
+		LOGE_IF(dev_fd<0, "Couldn't open %s (%s)", dev_name, strerror(errno));
+
+		dev_name = ISL_DEVICE_NAME;
+
+		dev_fd = open(ISL_DEVICE_NAME, O_RDONLY);
+
+		LOGE_IF(dev_fd<0, "Couldn't open %s (%s)", dev_name, strerror(errno));
+		
+	}
+
+    }
+    else
+    {
     }
     return 0;
 }

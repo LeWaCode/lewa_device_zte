@@ -23,8 +23,9 @@ PRODUCT_PACKAGES += \
     lights.roamer \
     libOmxVidEnc \
     abtfilt \
-    dexpreopt
-    
+    dexpreopt \
+    LeWaFM
+
 #liuhao removed, use PicFolder.apk 
 #    Gallery3D \
 
@@ -147,12 +148,33 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.media.dec.jpeg.memcap=20000000 \
     ro.opengles.version=131072
 
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.lewa.swapper.part_path=/dev/block/mmcblk0p3
+
 # ioz9 Fix APGS support
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.ril.def.agps.mode=2
-         
+
+PRODUCT_COPY_FILES += \
+    lewa/frameworks/lockscreen/HVGA/lockscreen.zip:/system/media/lockscreen.zip \
+    lewa/frameworks/theme/HVGA/default.lwt:/system/media/default.lwt
+
 # added by ioz9 2012-03-03
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.config.hwfeature_wakeupkey=3 \
     ro.config.hw_menu_unlockscreen=true \
     ro.camera.intrplt.2mpto3mp=true
+
+# Perfomance tweaks by ioz9
+PRODUCT_PROPERTY_OVERRIDES += \
+    dalvik.vm.lockprof.threshold=500 \
+    dalvik.vm.dexopt-flags=m=y \
+    dalvik.vm.heapsize=48m \
+    dalvik.vm.execution-mode=int:jit \
+    dalvik.vm.dexopt-data-only=1 \
+    ro.sf.hwrotation=180 \
+    debug.sf.hw=1 \
+    windowsmgr.max_events_per_sec=120 \
+    video.accelerate.hw=1 \
+    debug.composition.type=gpu \
+    debug.performance.tuning=1
